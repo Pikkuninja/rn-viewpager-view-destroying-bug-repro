@@ -1,0 +1,54 @@
+diff --git a/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/FragmentAdapter.java b/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/FragmentAdapter.java
+index 9275ad8..0788574 100644
+--- a/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/FragmentAdapter.java
++++ b/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/FragmentAdapter.java
+@@ -1,5 +1,6 @@
+ package com.reactnativecommunity.viewpager;
+ 
++import android.os.Bundle;
+ import android.view.View;
+ 
+ import androidx.annotation.NonNull;
+@@ -53,6 +54,24 @@ public class FragmentAdapter extends FragmentStateAdapter {
+     }
+ 
+     public View getChildAt(int index) {
+-        return children.get(index).getView();
++        ViewPagerFragment fragment = children.get(index);
++        if (fragment == null) {
++            return null;
++        }
++
++        View view = fragment.getView();
++        if (view != null) {
++            return view;
++        }
++
++        Bundle arguments = fragment.getArguments();
++        if (arguments == null) {
++            return null;
++        }
++
++        int viewId = arguments.getInt(ViewPagerFragment.CHILD_VIEW_KEY, -1);
++        return viewId != -1 ?
++                ReactViewPagerManager.reactChildrenViews.get(viewId)
++                : null;
+     }
+ }
+diff --git a/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/ReactViewPagerManager.java b/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/ReactViewPagerManager.java
+index 322a3c3..0e873d7 100644
+--- a/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/ReactViewPagerManager.java
++++ b/node_modules/@react-native-community/viewpager/android/src/main/java/com/reactnativecommunity/viewpager/ReactViewPagerManager.java
+@@ -127,8 +127,10 @@ public class ReactViewPagerManager extends ViewGroupManager<ViewPager2> {
+ 
+     @Override
+     public void removeViewAt(ViewPager2 parent, int index) {
+-        reactChildrenViews.removeAt(index);
+-        ((FragmentAdapter) parent.getAdapter()).removeFragmentAt(index);
++        View viewToRemove = getChildAt(parent, index);
++        if (viewToRemove != null) {
++            removeView(parent, viewToRemove);
++        }
+     }
+ 
+     @Override
