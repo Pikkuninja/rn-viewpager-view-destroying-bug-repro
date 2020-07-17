@@ -1,4 +1,6 @@
-# Sample for reproducing bug in react-native-viewpager where wrong Views get destroyed in Java side and the pages become blank
+The issue has been fixed in react-native-viewpager [in this PR](https://github.com/react-native-community/react-native-viewpager/pull/191) with a slightly different approach, but still addressing the issues mentioned below.
+
+## Sample for reproducing bug in react-native-viewpager where wrong Views get destroyed in Java side and the pages become blank
 
 ![GIF showing the bug](/viewpager-blank-page-bug.gif)
 
